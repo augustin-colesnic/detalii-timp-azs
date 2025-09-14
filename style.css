@@ -341,3 +341,19 @@ body.compact-view .center-section {
         max-width: 95vw;
     }
 }
+
+/* Memorize toggle styling */
+.memorize-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.1em;
+    color: #fff;
+    margin-top: 10px;
+}
+
+.memorize-toggle input[type="checkbox"] {
+    accent-color: #2196f3;
+    width: 20px;
+    height: 20px;
+}

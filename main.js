@@ -105,6 +105,50 @@ document.addEventListener('DOMContentLoaded', () => {
     modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
     modalInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') saveButton.click(); });
 
+    // First Letter Method: convert text to initials
+    function firstLetterMethod(text) {
+        return text.replace(/(\S+)(\s*)/g, (match, word, space) => {
+            // If word starts with a letter, keep first letter, else keep the symbol
+            let first = word[0];
+            // Keep punctuation at the end of the word
+            let punct = '';
+            let rest = word.slice(1);
+            let m = rest.match(/[^\wăîâșțĂÎÂȘȚ]+$/);
+            if (m) {
+                punct = m[0];
+                first = word[0];
+            }
+            return first + punct + space;
+        });
+    }
+
+    // Update custom text display based on modal input and toggle
+    function updateCustomTextDisplay() {
+        const input = document.getElementById('modal-text-input').value;
+        const useFirstLetter = document.getElementById('first-letter-toggle').checked;
+        const display = document.getElementById('custom-text-display');
+        display.textContent = useFirstLetter ? firstLetterMethod(input) : input;
+    }
+
+    // Event listeners for modal input and toggle
+    window.addEventListener('DOMContentLoaded', () => {
+        const input = document.getElementById('modal-text-input');
+        const toggle = document.getElementById('first-letter-toggle');
+        const saveBtn = document.getElementById('save-button');
+        const display = document.getElementById('custom-text-display');
+        if (input) input.addEventListener('input', updateCustomTextDisplay);
+        if (toggle) toggle.addEventListener('change', updateCustomTextDisplay);
+        if (saveBtn) {
+            saveBtn.addEventListener('click', () => {
+                const useFirstLetter = toggle.checked;
+                const value = input.value;
+                display.textContent = useFirstLetter ? firstLetterMethod(value) : value;
+                // Optionally close modal here if desired
+                document.getElementById('settings-modal').classList.add('hidden');
+            });
+        }
+    });
+
     // Inițializare
     updateTime();
     setInterval(updateTime, 1000);
