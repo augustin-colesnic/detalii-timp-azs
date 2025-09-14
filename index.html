@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desktop Dinamic</title>
+    <!-- Includem SunCalc.js pentru calculul răsăritului/apusului -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.8.0/suncalc.min.js"></script>
+    <script src="main.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
+        /* Stiluri de bază și fundal */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+            overflow: hidden;
+            background-image: url('https://placehold.co/1920x1080/121212/e0e0e0?text=.');
+            background-size: cover;
+            background-position: center;
+            text-shadow: 0 0 10px rgba(0,0,0,0.7);
+            transition: padding 0.4s ease;
+        }
+
+        /* Container principal pentru a organiza conținutul */
+        .container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        /* Secțiunea de sus (dată și informații despre soare) */
+        .top-section {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 0 20px;
+            box-sizing: border-box;
+            transition: max-width 0.4s ease;
+        }
+        
+        .date-info, .sun-info {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px 25px;
+            border-radius: 12px;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .date-info h2, .sun-info h2 {
+            margin: 0;
+            font-size: 1.2em;
+            font-weight: 400;
+        }
+
+        .date-info p, .sun-info p {
+            margin: 5px 0 0;
+            font-size: 1em;
+            font-weight: 300;
+        }
+        
+        /* Secțiunea centrală (ceas și text personalizat) */
+        .center-section {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+            width: 100%;
+            transition: max-width 0.4s ease;
+        }
+        
+        /* Modificări pentru modul compact */
+        body.compact-view .top-section,
+        body.compact-view .center-section {
+            max-width: 1300px;
+        }
+
+        #clock {
+            font-size: 8rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        /* Wrapper stilizat pentru textul personalizat */
+        #custom-text-wrapper {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px 40px;
+            border-radius: 12px;
+            margin-top: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            max-width: 80%;
+            opacity: 0; /* Ascuns implicit */
+            transform: scale(0.95);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            pointer-events: none;
+        }
+
+        #custom-text-wrapper.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        #custom-text-display {
+            font-size: 2.2rem;
+            font-weight: 300;
+            min-height: 40px;
+        }
+        
+        /* Butonul de editare */
+        #edit-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            z-index: 999;
+        }
+
+        #edit-button:hover {
+            background-color: rgba(0, 0, 0, 0.6);
+            transform: scale(1.1);
+        }
+
+        #edit-button svg {
+            color: #e0e0e0;
+        }
+
+        /* Fereastra modală */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 1000; opacity: 1; transition: opacity 0.3s ease;
+        }
+        .modal-overlay.hidden { opacity: 0; pointer-events: none; }
+        .modal-content {
+            background: rgba(30, 30, 30, 0.9); padding: 30px 40px; border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1); text-align: center;
+            width: 90%; max-width: 500px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .modal-content h3 { margin-top: 0; margin-bottom: 20px; font-weight: 400; }
+        #modal-text-input {
+            width: 100%; padding: 12px; font-size: 1em; background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px;
+            color: #e0e0e0; text-align: center; outline: none;
+            transition: all 0.3s ease; box-sizing: border-box;
+        }
+        #modal-text-input:focus { border-color: #fff; }
+
+        /* Stil pentru opțiunile din modal */
+        .setting-option { margin-top: 25px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+        .setting-option h4 { margin-top: 0; margin-bottom: 15px; font-weight: 400; color: #aaa; }
+        .layout-toggle { display: flex; justify-content: center; background-color: rgba(0,0,0,0.4); border-radius: 8px; padding: 5px; }
+        .layout-toggle input { display: none; }
+        .layout-toggle label {
+            flex: 1; padding: 8px 15px; border-radius: 6px; cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .layout-toggle input:checked + label { background-color: rgba(255, 255, 255, 0.15); }
+
+        #save-button {
+            margin-top: 30px; padding: 10px 20px; font-size: 1em; background-color: #28a745;
+            color: white; border: none; border-radius: 8px; cursor: pointer;
+            transition: background-color 0.3s ease; width: 100%;
+        }
+        #save-button:hover { background-color: #218838; }
+        
+        /* Media queries */
+        @media (max-width: 768px) {
+            .top-section { flex-direction: column; align-items: center; gap: 20px; }
+            #clock { font-size: 5rem; }
+            #custom-text-display { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header class="top-section">
+            <div id="date-info" class="date-info">
+                <h2 id="day-of-week"></h2>
+                <p id="full-date"></p>
+                <p id="week-info"></p>
+            </div>
+            <div id="sun-info" class="sun-info">
+                <h2>Răsărit & Apus</h2>
+                <p id="sunrise-time">Se calculează...</p>
+                <p id="sunset-time">Se calculează...</p>
+            </div>
+        </header>
+
+        <main class="center-section">
+            <div id="clock">00:00:00</div>
+            <div id="custom-text-wrapper">
+                <div id="custom-text-display"></div>
+            </div>
+        </main>
+    </div>
+
+    <div id="edit-button" title="Editează mesajul">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 0 2.82l-.15.1a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1 0-2.82l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+    </div>
+
+    <div id="settings-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3>Editează Mesajul Afișat</h3>
+            <input type="text" id="modal-text-input" placeholder="Scrie un mesaj aici...">
+            
+            <div class="setting-option">
+                <h4>Aranjament</h4>
+                <div class="layout-toggle">
+                    <input type="radio" id="layout-extended" name="layout" value="extended">
+                    <label for="layout-extended">Extins</label>
+                    <input type="radio" id="layout-compact" name="layout" value="compact">
+                    <label for="layout-compact">Compact</label>
+                </div>
+            </div>
+
+            <button id="save-button">Salvează și Închide</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const clockElement = document.getElementById('clock');
+            const dayOfWeekElement = document.getElementById('day-of-week');
+            const fullDateElement = document.getElementById('full-date');
+            const weekInfoElement = document.getElementById('week-info');
+            const sunriseElement = document.getElementById('sunrise-time');
+            const sunsetElement = document.getElementById('sunset-time');
+            const customTextWrapper = document.getElementById('custom-text-wrapper');
+            const customTextDisplay = document.getElementById('custom-text-display');
+            const editButton = document.getElementById('edit-button');
+            const modal = document.getElementById('settings-modal');
+            const modalInput = document.getElementById('modal-text-input');
+            const saveButton = document.getElementById('save-button');
+
+            const ZILE_SAPTAMANA = ['Duminică', 'Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă'];
+            const LUNI_AN = ['ianuarie', 'februarie', 'martie', 'aprilie', 'mai', 'iunie', 'iulie', 'august', 'septembrie', 'octombrie', 'noiembrie', 'decembrie'];
+
+            function updateTime() {
+                const now = new Date();
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
+                clockElement.textContent = `${hours}:${minutes}:${seconds}`;
+                dayOfWeekElement.textContent = ZILE_SAPTAMANA[now.getDay()];
+                fullDateElement.textContent = `${now.getDate()} ${LUNI_AN[now.getMonth()]} ${now.getFullYear()}`;
+                weekInfoElement.textContent = `Săptămâna ${getWeekNumber(now)}, Anul ${now.getFullYear()}`;
+            }
+            
+            function getWeekNumber(d) {
+                d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+                d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+                const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+                return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+            }
+
+            function updateSunInfo() {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const { latitude, longitude } = position.coords;
+                    const times = SunCalc.getTimes(new Date(), latitude, longitude);
+                    const formatTime = (date) => `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+                    sunriseElement.textContent = `Răsărit: ${formatTime(times.sunrise)}`;
+                    sunsetElement.textContent = `Apus: ${formatTime(times.sunset)}`;
+                }, () => {
+                    const defaultCoords = { latitude: 44.4268, longitude: 26.1025 };
+                    const times = SunCalc.getTimes(new Date(), defaultCoords.latitude, defaultCoords.longitude);
+                    const formatTime = (date) => `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+                    sunriseElement.textContent = `Răsărit: ${formatTime(times.sunrise)} (București)`;
+                    sunsetElement.textContent = `Apus: ${formatTime(times.sunset)} (București)`;
+                });
+            }
+
+            function loadCustomText() {
+                const savedText = localStorage.getItem('customDesktopText');
+                if (savedText && savedText.trim() !== '') {
+                    customTextDisplay.textContent = savedText;
+                    modalInput.value = savedText;
+                    customTextWrapper.classList.add('visible');
+                }
+            }
+
+            function loadLayoutPreference() {
+                const savedLayout = localStorage.getItem('desktopLayout') || 'extended';
+                if (savedLayout === 'compact') {
+                    document.body.classList.add('compact-view');
+                    document.getElementById('layout-compact').checked = true;
+                } else {
+                    document.body.classList.remove('compact-view');
+                    document.getElementById('layout-extended').checked = true;
+                }
+            }
+            
+            function closeModal() { modal.classList.add('hidden'); }
+
+            editButton.addEventListener('click', () => {
+                modal.classList.remove('hidden');
+                modalInput.focus();
+            });
+
+            saveButton.addEventListener('click', () => {
+                const newText = modalInput.value;
+                customTextDisplay.textContent = newText;
+                localStorage.setItem('customDesktopText', newText);
+                
+                if (newText.trim() !== '') {
+                    customTextWrapper.classList.add('visible');
+                } else {
+                    customTextWrapper.classList.remove('visible');
+                }
+
+                closeModal();
+            });
+            
+            document.querySelectorAll('input[name="layout"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    const newLayout = e.target.value;
+                    localStorage.setItem('desktopLayout', newLayout);
+                    if (newLayout === 'compact') {
+                        document.body.classList.add('compact-view');
+                    } else {
+                        document.body.classList.remove('compact-view');
+                    }
+                });
+            });
+
+            modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+            modalInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') saveButton.click(); });
+
+            // Inițializare
+            updateTime();
+            setInterval(updateTime, 1000);
+            updateSunInfo();
+            loadCustomText();
+            loadLayoutPreference();
+        });
+    </script>
+</body>
+</html>
+
