@@ -3,8 +3,10 @@
 /* Stiluri de bază și fundal */
 body {
     font-family: 'Roboto', sans-serif;
-    background-color: #121212;
-    color: #e0e0e0;
+    background: linear-gradient(135deg, #f9d423 0%, #ff4e50 40%, #6a3093 80%, #2b5876 100%);
+    background-size: cover;
+    background-position: center;
+    color: #f7f7f7;
     margin: 0;
     height: 100vh;
     display: flex;
@@ -13,10 +15,6 @@ body {
     align-items: center;
     text-align: center;
     overflow: hidden;
-    background-image: url('https://placehold.co/1920x1080/121212/e0e0e0?text=.');
-    background-size: cover;
-    background-position: center;
-    text-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
     transition: padding 0.4s ease;
 }
 
@@ -34,37 +32,45 @@ body {
 
 /* Secțiunea de sus (dată și informații despre soare) */
 .top-section {
-    width: 100%;
+    background: linear-gradient(90deg, #f9d423 0%, #ff4e50 100%);
+    padding: 32px 24px 24px 24px;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(255, 78, 80, 0.15);
     display: flex;
+    flex-direction: row;
+    align-items: center;
     justify-content: space-between;
-    align-items: flex-start;
-    padding: 0 20px;
-    box-sizing: border-box;
-    transition: max-width 0.4s ease;
+    gap: 32px;
+    margin-bottom: 32px;
 }
 
-.date-info,
-.sun-info {
-    background: rgba(0, 0, 0, 0.3);
-    padding: 15px 25px;
+.top-section .date-info,
+.top-section .sun-info {
+    color: #2b5876;
+    text-align: left;
+}
+
+.top-section #clock {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: #fff;
+    background: rgba(106, 48, 147, 0.18);
+    padding: 16px 32px;
     border-radius: 12px;
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 2px 8px rgba(106, 48, 147, 0.10);
+    letter-spacing: 2px;
 }
 
-.date-info h2,
-.sun-info h2 {
-    margin: 0;
-    font-size: 1.2em;
-    font-weight: 400;
+.top-section h2 {
+    margin: 0 0 8px 0;
+    font-size: 1.3rem;
+    font-weight: 500;
 }
 
-.date-info p,
-.sun-info p {
-    margin: 5px 0 0;
-    font-size: 1em;
-    font-weight: 300;
+.top-section p {
+    margin: 4px 0;
+    font-size: 1rem;
+    opacity: 0.95;
 }
 
 /* Secțiunea centrală (ceas și text personalizat) */
@@ -76,6 +82,14 @@ body {
     flex-grow: 1;
     width: 100%;
     transition: max-width 0.4s ease;
+    background: transparent
+        /* deep blue gradient */
+        box-shadow: 0 4px 24px rgba(42, 82, 152, 0.10);
+    border-radius: 20px;
+    padding: 40px 0;
+    margin-bottom: 32px;
+    min-height: 320px;
+    transition: box-shadow 0.3s, background 0.3s;
 }
 
 /* Modificări pentru modul compact */
@@ -92,16 +106,19 @@ body.compact-view .center-section {
 
 /* Wrapper stilizat pentru textul personalizat */
 #custom-text-wrapper {
-    background: rgba(0, 0, 0, 0.2);
-    padding: 20px 40px;
-    border-radius: 12px;
-    margin-top: 25px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: linear-gradient(120deg, #1e3c72 0%, #2a5298 100%);
+    /* deep blue, more opaque */
+    padding: 32px 48px;
+    border-radius: 16px;
+    margin-top: 30px;
+    border: 1.5px solid rgba(255, 255, 255, 0.18);
+    /* lighter border */
+    box-shadow: 0 4px 24px rgba(42, 82, 152, 0.18);
     max-width: 80%;
     opacity: 0;
     /* Ascuns implicit */
-    transform: scale(0.95);
-    transition: opacity 0.4s ease, transform 0.4s ease;
+    transform: scale(0.97);
+    transition: opacity 0.4s, transform 0.4s;
     pointer-events: none;
 }
 
@@ -112,17 +129,21 @@ body.compact-view .center-section {
 
 #custom-text-display {
     font-size: 2.2rem;
-    font-weight: 300;
+    font-weight: 400;
+    color: #fff;
     min-height: 40px;
+    text-shadow: 0 2px 8px rgba(30, 60, 114, 0.18);
+    letter-spacing: 1px;
 }
 
 /* Butonul de editare */
 #edit-button {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    top: 24px;
+    right: 24px;
+    background-color: rgba(42, 82, 152, 0.18);
+    /* faded deep blue */
+    border: 1px solid rgba(42, 82, 152, 0.10);
     border-radius: 50%;
     width: 50px;
     height: 50px;
@@ -136,12 +157,13 @@ body.compact-view .center-section {
 }
 
 #edit-button:hover {
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: rgba(42, 82, 152, 0.32);
     transform: scale(1.1);
 }
 
 #edit-button svg {
-    color: #e0e0e0;
+    color: #bfcbe6;
+    /* soft neutral blue */
 }
 
 /* Fereastra modală */
@@ -167,38 +189,27 @@ body.compact-view .center-section {
 }
 
 .modal-content {
-    background: rgba(30, 30, 30, 0.9);
-    padding: 30px 40px;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(120deg, #1e3c72 0%, #2a5298 100%);
+    color: #fff;
+    padding: 40px 48px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
     text-align: center;
-    width: 90%;
-    max-width: 500px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 10px 30px rgba(42, 82, 152, 0.18);
 }
 
-.modal-content h3 {
-    margin-top: 0;
-    margin-bottom: 20px;
-    font-weight: 400;
+.modal-content h3,
+.modal-content h4 {
+    color: #fff;
 }
 
 #modal-text-input {
-    width: 100%;
-    padding: 12px;
-    font-size: 1em;
-    background: rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    color: #e0e0e0;
-    text-align: center;
-    outline: none;
-    transition: all 0.3s ease;
-    box-sizing: border-box;
-}
-
-#modal-text-input:focus {
-    border-color: #fff;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: #fff;
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 1.1em;
 }
 
 /* Stil pentru opțiunile din modal */
@@ -206,13 +217,14 @@ body.compact-view .center-section {
     margin-top: 25px;
     padding-top: 20px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
+
 }
 
 .setting-option h4 {
     margin-top: 0;
     margin-bottom: 15px;
     font-weight: 400;
-    color: #aaa;
+    color: #ffffff;
 }
 
 .layout-toggle {
@@ -240,20 +252,63 @@ body.compact-view .center-section {
 }
 
 #save-button {
-    margin-top: 30px;
+    margin-top: 20px;
     padding: 10px 20px;
     font-size: 1em;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 8px;
+    background: linear-gradient(90deg, #2196f3 0%, #1769aa 100%);
+    color: #fff;
+    border-radius: 10px;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(33, 150, 243, 0.10);
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background 0.3s;
     width: 100%;
+    border: none;
 }
 
 #save-button:hover {
-    background-color: #218838;
+    background: linear-gradient(90deg, #1769aa 0%, #2196f3 100%);
+}
+
+/* Stiluri pentru imaginea din secțiunea centrală */
+.center-image-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 32px;
+    /* No border, no box-shadow */
+}
+
+.center-image {
+    max-width: 480px;
+    width: 100%;
+    height: auto;
+    border-radius: 18px;
+    border: none;
+    box-shadow: none;
+    transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+    perspective: 800px;
+    animation: breathe 5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.center-image:hover {
+    /* No extra animation on hover, keep breathing effect */
+}
+
+@keyframes breathe {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.10);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 
 /* Media queries */
@@ -270,5 +325,19 @@ body.compact-view .center-section {
 
     #custom-text-display {
         font-size: 1.5rem;
+    }
+
+    .center-section {
+        padding: 20px 0;
+        min-height: 180px;
+
+    }
+
+    .modal-content {
+        padding: 20px 10px;
+    }
+
+    .center-image {
+        max-width: 95vw;
     }
 }
