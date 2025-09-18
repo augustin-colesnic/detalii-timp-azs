@@ -32,64 +32,94 @@ body {
 
 /* Secțiunea de sus (dată și informații despre soare) */
 .top-section {
+    width: 90%;
+    margin: 0 auto 32px auto;
     background: linear-gradient(90deg, #f9d423 0%, #ff4e50 100%);
-    padding: 32px 24px 24px 24px;
+    padding: 48px 36px 36px 36px;
     border-radius: 18px;
     box-shadow: 0 4px 24px rgba(255, 78, 80, 0.15);
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
-    gap: 32px;
+    justify-content: center;
+    gap: 48px;
     margin-bottom: 32px;
+    min-height: 160px;
 }
 
 .top-section .date-info,
 .top-section .sun-info {
     color: #2b5876;
     text-align: left;
+    font-size: 1.25rem;
+    font-weight: 500;
 }
 
 .top-section #clock {
-    font-size: 2.5rem;
-    font-weight: 600;
+    font-size: 4rem;
+    font-weight: 800;
     color: #fff;
     background: rgba(106, 48, 147, 0.18);
-    padding: 16px 32px;
-    border-radius: 12px;
+    padding: 10px 20px;
+    margin-bottom: 10px;
+    border-radius: 16px;
     box-shadow: 0 2px 8px rgba(106, 48, 147, 0.10);
     letter-spacing: 2px;
 }
 
 .top-section h2 {
-    margin: 0 0 8px 0;
-    font-size: 1.3rem;
-    font-weight: 500;
+    margin: 0 0 12px 0;
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: 1px;
 }
 
 .top-section p {
-    margin: 4px 0;
-    font-size: 1rem;
-    opacity: 0.95;
+    margin: 6px 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    opacity: 0.98;
 }
 
 /* Secțiunea centrală (ceas și text personalizat) */
 .center-section {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     flex-grow: 1;
     width: 100%;
     transition: max-width 0.4s ease;
-    background: transparent
-        /* deep blue gradient */
-        box-shadow: 0 4px 24px rgba(42, 82, 152, 0.10);
+    background: transparent;
+    box-shadow: 0 4px 24px rgba(42, 82, 152, 0.10);
     border-radius: 20px;
-    padding: 40px 0;
+    padding: 0;
     margin-bottom: 32px;
     min-height: 320px;
     transition: box-shadow 0.3s, background 0.3s;
+}
+
+#clock-date-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+}
+
+#date-info {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 2rem;
+    justify-content: space-between;
+    min-width: 50vw;
+}
+
+#sun-details,
+#calendar {
+    line-height: 0.5;
 }
 
 /* Modificări pentru modul compact */
@@ -271,26 +301,39 @@ body.compact-view .center-section {
 }
 
 /* Stiluri pentru imaginea din secțiunea centrală */
-.center-image-wrapper {
+.center-image-wrapper,
+#breathing-logo {
+    position: static;
+    padding: 1rem;
+    background: none;
+    border-radius: 12px;
+    box-shadow: none;
+    width: 20vw;
+    height: 30vh;
+    margin: 0 24px 0 0;
+    overflow: hidden;
     display: flex;
-    justify-content: center;
     align-items: center;
-    width: 100%;
-    margin-bottom: 32px;
-    /* No border, no box-shadow */
+    justify-content: flex-start;
+    flex-shrink: 0;
+    max-width: none;
+    max-height: none;
 }
 
 .center-image {
-    max-width: 480px;
-    width: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
     height: auto;
-    border-radius: 18px;
+    border-radius: 12px;
     border: none;
     box-shadow: none;
     transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
     will-change: transform;
     perspective: 800px;
     animation: breathe 5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    object-fit: contain;
+    display: block;
 }
 
 .center-image:hover {
@@ -312,34 +355,128 @@ body.compact-view .center-section {
 }
 
 /* Media queries */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
+    .container {
+        padding: 6px;
+    }
+
     .top-section {
-        flex-direction: column;
+        width: 98%;
+        margin: 0 auto 10px auto;
+        flex-direction: row;
         align-items: center;
-        gap: 20px;
+        gap: 10px;
+        padding: 16px 6px 10px 6px;
+        min-height: 0;
+        margin-bottom: 10px;
     }
 
     #clock {
-        font-size: 5rem;
+        font-size: 1.2rem;
+        padding: 0;
     }
 
     #custom-text-display {
-        font-size: 1.5rem;
+        font-size: 1.1rem;
     }
 
     .center-section {
-        padding: 20px 0;
-        min-height: 180px;
-
+        padding: 0;
+        margin-bottom: 0;
+        min-height: 0;
     }
 
     .modal-content {
-        padding: 20px 10px;
+        padding: 10px 4px;
+    }
+
+    .center-image-wrapper,
+    #breathing-logo {
+        width: 32vw;
+        height: 20vh;
+        padding: 0.5rem;
+        margin: 0 6px 0 0;
     }
 
     .center-image {
-        max-width: 95vw;
+        max-width: 100%;
+        max-height: 100%;
     }
+
+    #custom-text-wrapper {
+        padding: 10px 8px;
+        margin-top: 10px;
+        max-width: 98%;
+    }
+
+
+}
+
+@media (max-width: 600px) {
+    .container {
+        padding: 2px;
+    }
+
+    .top-section {
+        width: 100%;
+        margin: 0 auto 4px auto;
+        flex-direction: column;
+        align-items: center;
+        gap: 1px;
+        padding: 6px 2px 4px 2px;
+        min-height: 0;
+        margin-bottom: 4px;
+    }
+
+    .center-image-wrapper,
+    #breathing-logo {
+        width: 40vw;
+        height: 20vh;
+        padding: 0.25rem;
+        margin: 0 2px 0 0;
+    }
+
+    .center-image {
+        max-width: 100%;
+        max-height: 100%;
+    }
+
+    #clock {
+        font-size: 1rem;
+        padding: 4px 6px;
+    }
+
+    .top-section h2 {
+        font-size: 2rem;
+        margin-bottom: 4px;
+    }
+
+    .top-section p {
+        font-size: 0.8rem;
+        margin: 0;
+    }
+
+    .center-section {
+        padding: 0;
+        margin-bottom: 0 t;
+        min-height: 0;
+    }
+
+    #custom-text-wrapper {
+        padding: 4px 2px;
+        margin-top: 4px;
+        max-width: 99%;
+    }
+
+    #custom-text-display {
+        font-size: 0.8rem;
+    }
+
+    .modal-content {
+        padding: 4px 2px;
+    }
+
+
 }
 
 /* Memorize toggle styling */

@@ -12,24 +12,29 @@
 <body>
 
     <div class="container">
+        
         <header class="top-section">
-            <div id="date-info" class="date-info">
-                <h2 id="day-of-week"></h2>
-                <p id="full-date"></p>
-                <p id="week-info"></p>
+            <div class="center-image-wrapper" id="breathing-logo">
+                <img src="assets/Tulcea 2025-2026-sc-sabat-vibranta.png" alt="Tulcea 2025-2026 Sabat Vibranta" class="center-image" />
             </div>
-            <div id="clock">00:00:00</div>
-            <div id="sun-info" class="sun-info">
-                <h2>Răsărit & Apus</h2>
-                <p id="sunrise-time">Se calculează...</p>
-                <p id="sunset-time">Se calculează...</p>
-            </div>
+            <section id="clock-date-container">
+                <div id="clock">00:00:00</div>
+                <div id="date-info" class="date-info">
+                    <section id="calendar">
+                        <h2 id="day-of-week"></h2>
+                        <h3 id="full-date"></h3>
+                        <h3 id="week-info"></h3>
+                    </section>
+                    <section id="sun-details">
+                        <h2>Soarele:</h2>
+                        <h3 id="sunrise-time">Se calculează...</h3>
+                        <h3 id="sunset-time">Se calculează...</h3>
+                    </section>
+                </div>
+            </section>
         </header>
 
         <main class="center-section">
-            <div class="center-image-wrapper">
-                <img src="assets/Tulcea 2025-2026-sc-sabat-vibranta.png" alt="Tulcea 2025-2026 Sabat Vibranta" class="center-image" />
-            </div>
             <div id="custom-text-wrapper">
                 <div id="custom-text-display"></div>
             </div>
