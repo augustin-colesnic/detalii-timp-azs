@@ -107,19 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // First Letter Method: convert text to initials
     function firstLetterMethod(text) {
-        return text.replace(/(\S+)(\s*)/g, (match, word, space) => {
-            // If word starts with a letter, keep first letter, else keep the symbol
-            let first = word[0];
-            // Keep punctuation at the end of the word
-            let punct = '';
-            let rest = word.slice(1);
-            let m = rest.match(/[^\wăîâșțĂÎÂȘȚ]+$/);
-            if (m) {
-                punct = m[0];
-                first = word[0];
-            }
-            return first + punct + space;
-        });
+        return text.replace(/(\p{L})\p{L}+/gu, '$1');
     }
 
     // Update custom text display based on modal input and toggle
