@@ -120,6 +120,7 @@ body {
 #sun-details,
 #calendar {
     line-height: 0.5;
+    font-size: larger;
 }
 
 /* Modificări pentru modul compact */
@@ -336,9 +337,6 @@ body.compact-view .center-section {
     display: block;
 }
 
-.center-image:hover {
-    /* No extra animation on hover, keep breathing effect */
-}
 
 @keyframes breathe {
     0% {
@@ -474,6 +472,31 @@ body.compact-view .center-section {
 
     .modal-content {
         padding: 4px 2px;
+    }
+
+
+}
+
+
+@media (max-width: 400px) {
+
+    .container {
+        padding: 5px;
+    }
+
+    #sun-details,
+    #calendar {
+        padding: 0 10px;
+        line-height: 1;
+        font-size: larger;
+    }
+
+    .center-image-wrapper,
+    #breathing-logo {
+        width: 40vw;
+        height: 20vh;
+        padding: 0.50rem;
+        margin: 0 2px 0 0;
     }
 
 
