@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sunriseElement = document.getElementById('sunrise-time');
     const sunsetElement = document.getElementById('sunset-time');
     const customTextWrapper = document.getElementById('custom-text-wrapper');
-    const customTextDisplay = document.getElementById('custom-text-display');
+    const customTextDisplay = document.getElementsByClassName('custom-text-display').item(0);
     const editButton = document.getElementById('edit-button');
     const modal = document.getElementById('settings-modal');
     const modalInput = document.getElementById('modal-text-input');
@@ -52,9 +52,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function loadCustomText() {
         const savedText = localStorage.getItem('customDesktopText');
         if (savedText && savedText.trim() !== '') {
-            customTextDisplay.textContent = savedText;
             modalInput.value = savedText;
             customTextWrapper.classList.add('visible');
+            updateCustomTextDisplay(); // Call updateCustomTextDisplay to apply styling
         }
     }
 
@@ -110,12 +110,29 @@ document.addEventListener('DOMContentLoaded', () => {
         return text.replace(/(\p{L})\p{L}+/gu, '$1');
     }
 
+    // Function to bold the first letter of each word
+    function boldFirstLetterOfEachWord(text) {
+        // This regex matches the first letter of each word,
+        // ignoring leading non-letter characters.
+        // (\p{L}) captures any Unicode letter
+        // \P{L} matches any character that is NOT a Unicode letter
+        return text.replace(/(^|\s)(\P{L}*)(\p{L})/gu, (match, p1, p2, p3) => {
+            return `${p1}${p2}<span class="first-letter-bold">${p3}</span>`;
+        });
+    }
+
     // Update custom text display based on modal input and toggle
     function updateCustomTextDisplay() {
         const input = document.getElementById('modal-text-input').value;
         const useFirstLetter = document.getElementById('first-letter-toggle').checked;
-        const display = document.getElementById('custom-text-display');
-        display.textContent = useFirstLetter ? firstLetterMethod(input) : input;
+        const display = document.getElementsByClassName('custom-text-display').item(0);
+        if (useFirstLetter) {
+            display.innerHTML = firstLetterMethod(input);
+            display.classList.add('transformed-text');
+        } else {
+            display.innerHTML = boldFirstLetterOfEachWord(input);
+            display.classList.remove('transformed-text');
+        }
     }
 
     // Event listeners for modal input and toggle
@@ -123,19 +140,32 @@ document.addEventListener('DOMContentLoaded', () => {
         const input = document.getElementById('modal-text-input');
         const toggle = document.getElementById('first-letter-toggle');
         const saveBtn = document.getElementById('save-button');
-        const display = document.getElementById('custom-text-display');
+        const display = document.getElementsByClassName('custom-text-display').item(0);
         if (input) input.addEventListener('input', updateCustomTextDisplay);
         if (toggle) toggle.addEventListener('change', updateCustomTextDisplay);
         if (saveBtn) {
             saveBtn.addEventListener('click', () => {
                 const useFirstLetter = toggle.checked;
                 const value = input.value;
-                display.textContent = useFirstLetter ? firstLetterMethod(value) : value;
+                if (useFirstLetter) {
+                    display.textContent = firstLetterMethod(value);
+                } else {
+                    display.innerHTML = boldFirstLetterOfEachWord(value);
+                }
                 // Optionally close modal here if desired
                 document.getElementById('settings-modal').classList.add('hidden');
             });
         }
     });
+
+    function loadFirstLetterTogglePreference() {
+        const firstLetterToggle = document.getElementById('first-letter-toggle');
+        const savedToggleState = localStorage.getItem('firstLetterMethodEnabled');
+        if (savedToggleState !== null) {
+            firstLetterToggle.checked = JSON.parse(savedToggleState);
+        }
+        updateCustomTextDisplay(); // Ensure display updates based on loaded toggle state
+    }
 
     // Inițializare
     updateTime();
@@ -143,4 +173,14 @@ document.addEventListener('DOMContentLoaded', () => {
     updateSunInfo();
     loadCustomText();
     loadLayoutPreference();
+    loadFirstLetterTogglePreference(); // Load toggle preference on page load
+
+    // Event listener for first-letter-toggle to save its state
+    const firstLetterToggle = document.getElementById('first-letter-toggle');
+    if (firstLetterToggle) {
+        firstLetterToggle.addEventListener('change', (e) => {
+            localStorage.setItem('firstLetterMethodEnabled', JSON.stringify(e.target.checked));
+            updateCustomTextDisplay(); // Update display immediately on toggle change
+        });
+    }
 });

@@ -1,87 +1,124 @@
 <!DOCTYPE html>
 <html lang="ro">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Detalii Timp</title>
     <!-- Includem SunCalc.js pentru calculul răsăritului/apusului -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.8.0/suncalc.min.js"></script>
     <script src="main.js"></script>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
     <div class="container">
-        
-        <header class="top-section">
-            <div class="center-image-wrapper" id="breathing-logo">
-                <img src="assets/Tulcea 2025-2026-sc-sabat-vibranta.png" alt="Tulcea 2025-2026 Sabat Vibranta" class="center-image" />
-            </div>
-            <section id="clock-date-container">
-                <div id="clock">00:00:00</div>
-                <div id="date-info" class="date-info">
-                    <section id="calendar">
-                        <h2 id="day-of-week"></h2>
-                        <h3 id="full-date"></h3>
-                        <h3 id="week-info"></h3>
-                    </section>
-                    <section id="sun-details">
-                        <h2>Soarele:</h2>
-                        <h3 id="sunrise-time">Se calculează...</h3>
-                        <h3 id="sunset-time">Se calculează...</h3>
-                    </section>
-                </div>
+      <header class="top-section">
+        <div class="center-image-wrapper" id="breathing-logo">
+          <img
+            src="assets/Tulcea 2025-2026-sc-sabat-vibranta.png"
+            alt="Tulcea 2025-2026 Sabat Vibranta"
+            class="center-image"
+          />
+        </div>
+        <section id="clock-date-container">
+          <div id="clock">00:00:00</div>
+          <div id="date-info" class="date-info">
+            <section id="calendar">
+              <h2 id="day-of-week"></h2>
+              <h3 id="full-date"></h3>
+              <h3 id="week-info"></h3>
             </section>
-        </header>
+            <section id="sun-details">
+              <h2>Soarele:</h2>
+              <h3 id="sunrise-time">Se calculează...</h3>
+              <h3 id="sunset-time">Se calculează...</h3>
+            </section>
+          </div>
+        </section>
+      </header>
 
-        <main class="center-section">
-            <div id="custom-text-wrapper">
-                <div id="custom-text-display"></div>
-            </div>
-        </main>
+      <main class="center-section">
+        <div id="custom-text-wrapper">
+          <div class="custom-text-display"></div>
+        </div>
+      </main>
     </div>
 
     <div id="edit-button" title="Editează mesajul">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 0 2.82l-.15.1a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1 0-2.82l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path
+          d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 0 2.82l-.15.1a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1 0-2.82l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"
+        ></path>
+        <circle cx="12" cy="12" r="3"></circle>
+      </svg>
     </div>
 
     <div id="settings-modal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <h3>Editează Mesajul Afișat</h3>
-            <input type="text" id="modal-text-input" placeholder="Scrie un mesaj aici...">
-            
-            <div class="setting-option">
-                <h4>Aranjament</h4>
-                <div class="layout-toggle">
-                    <input type="radio" id="layout-extended" name="layout" value="extended">
-                    <label for="layout-extended">Extins</label>
-                    <input type="radio" id="layout-compact" name="layout" value="compact">
-                    <label for="layout-compact">Compact</label>
-                </div>
-            </div>
-            <div class="setting-option">
-                <h4>Metodă Memorare</h4>
-                <label class="memorize-toggle">
-                    <input type="checkbox" id="first-letter-toggle">
-                    <span>Transformă textul în inițiale (First Letter Method)</span>
-                </label>
-            </div>
-             <details class="setting-option">
-                <summary>
-                <h4>INFO: <span class="info-emoji">ℹ️</span>Cum vezi detalii soare după locație? </h4>
-                 </summary>
-                <article id="location-details" class="info-box">
-                
-                    <p>Dacă browserul permite, se vor folosi detaliile locației pentru a calcula răsăritul și apusul soarelui.</p>
-                    <p>Dacă nu, se vor folosi coordonatele implicite (București, România).</p>
-                </article>
-               
-            </details>
+      <div class="modal-content">
+        <h3>Editează Mesajul Afișat</h3>
+        <input
+          type="text"
+          id="modal-text-input"
+          placeholder="Scrie un mesaj aici..."
+        />
 
-            <button id="save-button">Salvează</button>
+        <div class="setting-option">
+          <h4>Aranjament</h4>
+          <div class="layout-toggle">
+            <input
+              type="radio"
+              id="layout-extended"
+              name="layout"
+              value="extended"
+            />
+            <label for="layout-extended">Extins</label>
+            <input
+              type="radio"
+              id="layout-compact"
+              name="layout"
+              value="compact"
+            />
+            <label for="layout-compact">Compact</label>
+          </div>
         </div>
+        <div class="setting-option">
+          <h4>Metodă Memorare</h4>
+          <label class="memorize-toggle">
+            <input type="checkbox" id="first-letter-toggle" />
+            <span>Transformă textul în inițiale (First Letter Method)</span>
+          </label>
+        </div>
+        <details class="setting-option">
+          <summary>
+            <h4>
+              INFO:
+              <span class="info-emoji">ℹ️</span>
+              Cum vezi detalii soare după locație?
+            </h4>
+          </summary>
+          <article id="location-details" class="info-box">
+            <p>
+              Dacă browserul permite, se vor folosi detaliile locației pentru a
+              calcula răsăritul și apusul soarelui.
+            </p>
+            <p>
+              Dacă nu, se vor folosi coordonatele implicite (București,
+              România).
+            </p>
+          </article>
+        </details>
+
+        <button id="save-button">Salvează</button>
+      </div>
     </div>
-
-</body>
+  </body>
 </html>
-
