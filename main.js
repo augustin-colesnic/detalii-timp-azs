@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const clockElement = document.getElementById('clock');
     const dayOfWeekElement = document.getElementById('day-of-week');
     const fullDateElement = document.getElementById('full-date');
@@ -11,6 +11,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('settings-modal');
     const modalInput = document.getElementById('modal-text-input');
     const saveButton = document.getElementById('save-button');
+
+    // API endpoints (assumes `api/` is a subfolder of this app)
+    const SERVER_GET_URL = 'api/api.php?action=get';
+    const SERVER_SET_URL = 'api/api.php?action=set';
+
+    async function fetchServerDefault() {
+        try {
+            const res = await fetch(SERVER_GET_URL, {credentials: 'same-origin'});
+            if (!res.ok) throw new Error('network');
+            const data = await res.json();
+            return data;
+        } catch (e) {
+            console.warn('fetchServerDefault error', e);
+            return null;
+        }
+    }
 
     const ZILE_SAPTAMANA = ['Duminică', 'Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă'];
     const LUNI_AN = ['ianuarie', 'februarie', 'martie', 'aprilie', 'mai', 'iunie', 'iulie', 'august', 'septembrie', 'octombrie', 'noiembrie', 'decembrie'];
@@ -50,12 +66,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function loadCustomText() {
-        const savedText = localStorage.getItem('customDesktopText');
-        if (savedText && savedText.trim() !== '') {
-            modalInput.value = savedText;
-            customTextWrapper.classList.add('visible');
-            updateCustomTextDisplay(); // Call updateCustomTextDisplay to apply styling
-        }
+        // Prefer local override; otherwise fetch server default
+        return (async () => {
+            const savedText = localStorage.getItem('customDesktopText');
+            if (savedText && savedText.trim() !== '') {
+                modalInput.value = savedText;
+                customTextWrapper.classList.add('visible');
+                updateCustomTextDisplay(); // Call updateCustomTextDisplay to apply styling
+                return;
+            }
+
+            // No local override — try loading server default
+            try {
+                const server = await fetchServerDefault();
+                if (server && server.message && server.message.trim() !== '') {
+                    modalInput.value = server.message;
+                    customTextDisplay.textContent = server.message;
+                    customTextWrapper.classList.add('visible');
+                    window._serverMessageVersion = server.version || null;
+                    updateCustomTextDisplay();
+                }
+            } catch (e) {
+                // silently ignore — app still works with empty message
+                console.warn('Failed to load server default message', e);
+            }
+        })();
     }
 
     function loadLayoutPreference() {
