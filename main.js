@@ -11,15 +11,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     const modal = document.getElementById('settings-modal');
     const modalInput = document.getElementById('modal-text-input');
     const saveButton = document.getElementById('save-button');
+    const fetchServerButton = document.getElementById('fetch-server-button');
 
-    // API endpoints (assumes `api/` is a subfolder of this app)
-    const SERVER_GET_URL = 'api/api.php?action=get';
-    const SERVER_SET_URL = 'api/api.php?action=set';
+    // API endpoints
+    // In producție (pe domeniul azstulcea.ro) folosim cale relativă.
+    // În dezvoltare locală (localhost/192.168.x.x/Five Server) folosim URL absolut către producție.
+    const DEFAULT_API_BASE = 'api/api.php';
+    const PROD_API_BASE = 'https://www.azstulcea.ro/timp-tulcea/api/api.php';
+    const host = (location && location.hostname) ? location.hostname : '';
+    const isProdHost = host === 'www.azstulcea.ro' || host === 'azstulcea.ro';
+    const API_BASE = isProdHost ? DEFAULT_API_BASE : PROD_API_BASE;
+    const SERVER_GET_URL = `${API_BASE}?action=get`;
+    const SERVER_SET_URL = `${API_BASE}?action=set`;
 
     async function fetchServerDefault() {
+        // Returns null on failure; logs details
         try {
             const res = await fetch(SERVER_GET_URL, {credentials: 'same-origin'});
-            if (!res.ok) throw new Error('network');
+            if (!res.ok) {
+                console.warn('fetchServerDefault non-OK status', res.status, res.statusText);
+                // Attempt to read body for JSON error
+                try {
+                    const errJson = await res.json();
+                    console.warn('Server error JSON:', errJson);
+                } catch(_){}
+                return null;
+            }
             const data = await res.json();
             return data;
         } catch (e) {
@@ -124,6 +141,38 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         closeModal();
     });
+
+    // Fetch latest server default on demand
+    if (fetchServerButton) {
+        const errorSpan = document.createElement('span');
+        errorSpan.style.display = 'block';
+        errorSpan.style.marginTop = '4px';
+        errorSpan.style.fontSize = '0.85rem';
+        errorSpan.style.color = '#c0392b';
+        fetchServerButton.insertAdjacentElement('afterend', errorSpan);
+
+        fetchServerButton.addEventListener('click', async () => {
+            errorSpan.textContent = '';
+            fetchServerButton.disabled = true;
+            const original = fetchServerButton.textContent;
+            fetchServerButton.textContent = 'Se preia...';
+            const start = performance.now();
+            const server = await fetchServerDefault();
+            const durationMs = Math.round(performance.now() - start);
+            if (server && server.message) {
+                modalInput.value = server.message;
+                window._serverMessageVersion = server.version || null;
+                updateCustomTextDisplay();
+                fetchServerButton.textContent = `Preluat ✔ (${durationMs}ms)`;
+                setTimeout(()=>{ fetchServerButton.textContent = original; }, 2500);
+            } else {
+                errorSpan.textContent = 'Nu s-a putut prelua mesajul (verifică conexiunea sau serverul).';
+                fetchServerButton.textContent = 'Eroare';
+                setTimeout(()=>{ fetchServerButton.textContent = original; }, 2500);
+            }
+            fetchServerButton.disabled = false;
+        });
+    }
 
     document.querySelectorAll('input[name="layout"]').forEach(radio => {
         radio.addEventListener('change', (e) => {
