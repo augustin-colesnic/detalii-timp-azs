@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const sunsetElement = document.getElementById('sunset-time');
     const customTextWrapper = document.getElementById('custom-text-wrapper');
     const customTextDisplay = document.getElementsByClassName('custom-text-display').item(0);
-    const editButton = document.getElementById('edit-button');
+    const editButton = document.getElementById('edit-button-mini');
     const modal = document.getElementById('settings-modal');
     const modalInput = document.getElementById('modal-text-input');
     const saveButton = document.getElementById('save-button');
@@ -90,6 +90,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 modalInput.value = savedText;
                 customTextWrapper.classList.add('visible');
                 updateCustomTextDisplay(); // Call updateCustomTextDisplay to apply styling
+                startPetalRain();
                 return;
             }
 
@@ -102,6 +103,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     customTextWrapper.classList.add('visible');
                     window._serverMessageVersion = server.version || null;
                     updateCustomTextDisplay();
+                    startPetalRain(); // Added here
                 }
             } catch (e) {
                 // silently ignore — app still works with empty message
@@ -148,7 +150,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         errorSpan.style.display = 'block';
         errorSpan.style.marginTop = '4px';
         errorSpan.style.fontSize = '0.85rem';
-        errorSpan.style.color = '#c0392b';
+        errorSpan.style.color = '#e57373';
         fetchServerButton.insertAdjacentElement('afterend', errorSpan);
 
         fetchServerButton.addEventListener('click', async () => {
@@ -210,11 +212,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         const input = document.getElementById('modal-text-input').value;
         const useFirstLetter = document.getElementById('first-letter-toggle').checked;
         const display = document.getElementsByClassName('custom-text-display').item(0);
+        
+        // Regex to separate text from reference (e.g. "(1Tesaloniceni 5:18)")
+        const match = input.match(/^(.*?)\s*(\([^)]+\))\s*$/s);
+        let versePart = input;
+        let referencePart = '';
+        
+        if (match) {
+            versePart = match[1];
+            referencePart = match[2];
+        }
+
+        let processedVerse = useFirstLetter ? firstLetterMethod(versePart) : boldFirstLetterOfEachWord(versePart);
+        
+        display.innerHTML = `
+            <div class="verse-text">${processedVerse}</div>
+            ${referencePart ? `<div class="verse-reference">${referencePart}</div>` : ''}
+        `;
+
         if (useFirstLetter) {
-            display.innerHTML = firstLetterMethod(input);
             display.classList.add('transformed-text');
         } else {
-            display.innerHTML = boldFirstLetterOfEachWord(input);
             display.classList.remove('transformed-text');
         }
     }
@@ -260,6 +278,42 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadFirstLetterTogglePreference(); // Load toggle preference on page load
 
     // Event listener for first-letter-toggle to save its state
+    function startPetalRain() {
+        const container = document.getElementById('custom-text-wrapper');
+        const initialPetals = 8;
+        
+        for (let i = 0; i < initialPetals; i++) {
+            setTimeout(() => {
+                createPetal(container);
+            }, i * 800);
+        }
+        
+        setInterval(() => {
+            if (document.visibilityState === 'visible' && container.classList.contains('visible')) {
+                createPetal(container);
+            }
+        }, 4000);
+    }
+
+    function createPetal(container) {
+        const petal = document.createElement('span');
+        petal.className = 'petal';
+        petal.innerHTML = '✿';
+        
+        // Randomize drift - restricted to horizontal and slightly up
+        const driftX = (Math.random() - 0.5) * 300 + 'px';
+        const driftRot = (Math.random() * 720) + 'deg';
+        petal.style.setProperty('--drift-x', driftX);
+        petal.style.setProperty('--drift-rot', driftRot);
+        
+        // Randomize speed
+        const duration = 5 + Math.random() * 5 + 's';
+        petal.style.animation = `petal-up-drift ${duration} ease-out forwards`;
+        
+        container.appendChild(petal);
+        setTimeout(() => petal.remove(), 10000);
+    }
+
     const firstLetterToggle = document.getElementById('first-letter-toggle');
     if (firstLetterToggle) {
         firstLetterToggle.addEventListener('change', (e) => {
