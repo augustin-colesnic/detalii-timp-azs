@@ -134,18 +134,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     saveButton.addEventListener('click', () => {
-        const newText = modalInput.value;
-        customTextDisplay.textContent = newText;
-        localStorage.setItem('customDesktopText', newText);
+        const value = modalInput.value;
+        const toggle = document.getElementById('first-letter-toggle');
+        
+        localStorage.setItem('customDesktopText', value);
+        localStorage.setItem('firstLetterMethodEnabled', toggle.checked);
 
-        if (newText.trim() !== '') {
+        if (value.trim() !== '') {
             customTextWrapper.classList.add('visible');
         } else {
             customTextWrapper.classList.remove('visible');
         }
 
+        updateCustomTextDisplay();
         closeModal();
     });
+
+    // Toggle event listener: auto-update and auto-save
+    const toggleInput = document.getElementById('first-letter-toggle');
+    if (toggleInput) {
+        toggleInput.addEventListener('change', () => {
+            localStorage.setItem('firstLetterMethodEnabled', toggleInput.checked);
+            updateCustomTextDisplay();
+        });
+    }
+
+    // Modal input: auto-update preview
+    if (modalInput) {
+        modalInput.addEventListener('input', updateCustomTextDisplay);
+    }
 
     // Fetch latest server default on demand
     if (fetchServerButton) {
@@ -188,6 +205,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             } else {
                 document.body.classList.remove('compact-view');
             }
+            updateCustomTextDisplay(); // Force re-render on layout change
         });
     });
 
@@ -241,27 +259,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Event listeners for modal input and toggle
-    window.addEventListener('DOMContentLoaded', () => {
-        const input = document.getElementById('modal-text-input');
-        const toggle = document.getElementById('first-letter-toggle');
-        const saveBtn = document.getElementById('save-button');
-        const display = document.getElementsByClassName('custom-text-display').item(0);
-        if (input) input.addEventListener('input', updateCustomTextDisplay);
-        if (toggle) toggle.addEventListener('change', updateCustomTextDisplay);
-        if (saveBtn) {
-            saveBtn.addEventListener('click', () => {
-                const useFirstLetter = toggle.checked;
-                const value = input.value;
-                if (useFirstLetter) {
-                    display.textContent = firstLetterMethod(value);
-                } else {
-                    display.innerHTML = boldFirstLetterOfEachWord(value);
-                }
-                // Optionally close modal here if desired
-                document.getElementById('settings-modal').classList.add('hidden');
-            });
-        }
-    });
+    // Ensure display is up-to-date on initial load
+    updateCustomTextDisplay();
 
     function loadFirstLetterTogglePreference() {
         const firstLetterToggle = document.getElementById('first-letter-toggle');

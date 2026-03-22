@@ -450,13 +450,13 @@ body {
   margin-bottom: var(--spacing-sm);
   position: relative;
   z-index: 1; /* Explicit low z-index */
-  display: flex;
-  flex-direction: column;
+  display: block; /* Removed flex/column to prevent word-stacking bug */
 }
 
 .verse-text {
   margin-bottom: 12px;
   line-height: 1.3;
+  display: block;
 }
 
 .verse-reference {
@@ -464,7 +464,8 @@ body {
   font-weight: 600;
   font-style: italic;
   color: var(--accent-sky);
-  align-self: flex-end; /* Align to the right for an elegant look */
+  display: block;
+  text-align: right; /* Replaces align-self: flex-end */
   opacity: 0.9;
   letter-spacing: 0.5px;
 }
