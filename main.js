@@ -125,6 +125,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function closeModal() { modal.classList.add('hidden'); }
 
+    const closeBtn = document.getElementById('close-modal');
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+
     editButton.addEventListener('click', () => {
         modal.classList.remove('hidden');
         modalInput.focus();
