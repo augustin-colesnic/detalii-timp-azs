@@ -71,14 +71,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             const { latitude, longitude } = position.coords;
             const times = SunCalc.getTimes(new Date(), latitude, longitude);
             const formatTime = (date) => `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-            sunriseElement.textContent = `Răsare: ${formatTime(times.sunrise)}`;
-            sunsetElement.textContent = `Apune: ${formatTime(times.sunset)}`;
+            sunriseElement.textContent = `Răsaritul: ${formatTime(times.sunrise)}`;
+            sunsetElement.textContent = `Apusul: ${formatTime(times.sunset)}`;
         }, () => {
             const defaultCoords = { latitude: 44.4268, longitude: 26.1025 };
             const times = SunCalc.getTimes(new Date(), defaultCoords.latitude, defaultCoords.longitude);
             const formatTime = (date) => `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-            sunriseElement.textContent = `Răsare: ${formatTime(times.sunrise)} (București)`;
-            sunsetElement.textContent = `Apune: ${formatTime(times.sunset)} (București)`;
+            sunriseElement.textContent = `Răsaritul: ${formatTime(times.sunrise)} (București)`;
+            sunsetElement.textContent = `Apusul: ${formatTime(times.sunset)} (București)`;
         });
     }
 
