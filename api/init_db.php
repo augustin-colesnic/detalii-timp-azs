@@ -33,6 +33,7 @@ try {
 CREATE TABLE IF NOT EXISTS default_message (
   id INTEGER PRIMARY KEY CHECK (id = 1),
   message TEXT NOT NULL,
+  referinta TEXT,
   version INTEGER NOT NULL DEFAULT 1,
   updatedAt TEXT NOT NULL,
   updatedBy TEXT
@@ -40,8 +41,8 @@ CREATE TABLE IF NOT EXISTS default_message (
 SQL
     );
 
-    $stmt = $pdo->prepare("INSERT OR IGNORE INTO default_message (id, message, version, updatedAt, updatedBy) VALUES (1, :msg, 1, datetime('now'), 'system')");
-    $stmt->execute([':msg' => 'Bun venit!']);
+    $stmt = $pdo->prepare("INSERT OR IGNORE INTO default_message (id, message, referinta, version, updatedAt, updatedBy) VALUES (1, :msg, :ref, 1, datetime('now'), 'system')");
+    $stmt->execute([':msg' => 'Bun venit!', ':ref' => '']);
 
     echo "DB initialized at {$dbPath}\n";
 } catch (Exception $e) {

@@ -56,13 +56,21 @@ try {
 $action = $_GET['action'] ?? 'get';
 
 if ($action === 'get' && $_SERVER['REQUEST_METHOD'] === 'GET') {
-    $stmt = $pdo->query("SELECT message, version, updatedAt, updatedBy FROM default_message WHERE id = 1 LIMIT 1");
+    $stmt = $pdo->query("SELECT message, referinta, version, updatedAt, updatedBy FROM default_message WHERE id = 1 LIMIT 1");
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$row) send(404, ['error' => 'not_found']);
-    send(200, $row);
+    
+    // Transform keys for the client
+    $payload = [
+        'mesaj' => $row['message'],
+        'referinta' => $row['referinta'] ?? '',
+        'version' => $row['version'],
+        'updatedAt' => $row['updatedAt']
+    ];
+    send(200, $payload);
 }
 
-if ($action === 'set' && in_array($_SERVER['REQUEST_METHOD'], ['POST','PUT'])) {
+if ($action === 'set' && in_array($_SERVER['REQUEST_METHOD'], ['POST', 'PUT'])) {
     // admin authentication
     $provided = $_SERVER['HTTP_X_ADMIN_TOKEN'] ?? null;
     $raw = file_get_contents('php://input');
@@ -73,11 +81,13 @@ if ($action === 'set' && in_array($_SERVER['REQUEST_METHOD'], ['POST','PUT'])) {
         send(401, ['error' => 'unauthorized']);
     }
 
-    $message = $body['message'] ?? null;
-    if (!is_string($message)) send(400, ['error' => 'invalid_message']);
-    $message = trim($message);
-    if ($message === '') send(400, ['error' => 'empty_message']);
-    if (mb_strlen($message) > 2000) send(400, ['error' => 'message_too_long']);
+    $mesaj = $body['mesaj'] ?? ($body['message'] ?? null);
+    $referinta = $body['referinta'] ?? '';
+
+    if (!is_string($mesaj)) send(400, ['error' => 'invalid_mesaj']);
+    $mesaj = trim($mesaj);
+    if ($mesaj === '') send(400, ['error' => 'empty_mesaj']);
+    if (mb_strlen($mesaj) > 2000) send(400, ['error' => 'mesaj_too_long']);
 
     $clientVersion = isset($body['version']) ? intval($body['version']) : null;
 
@@ -91,11 +101,11 @@ if ($action === 'set' && in_array($_SERVER['REQUEST_METHOD'], ['POST','PUT'])) {
             send(409, ['error' => 'version_conflict', 'currentVersion' => $curVer]);
         }
         $nextVer = $curVer + 1;
-        $upd = $pdo->prepare("INSERT OR REPLACE INTO default_message (id, message, version, updatedAt, updatedBy) VALUES (1, :msg, :ver, datetime('now'), :by)");
-        $upd->execute([':msg' => $message, ':ver' => $nextVer, ':by' => 'admin']);
+        $upd = $pdo->prepare("INSERT OR REPLACE INTO default_message (id, message, referinta, version, updatedAt, updatedBy) VALUES (1, :msg, :ref, :ver, datetime('now'), :by)");
+        $upd->execute([':msg' => $mesaj, ':ref' => $referinta, ':ver' => $nextVer, ':by' => 'admin']);
         $pdo->commit();
 
-        send(200, ['message' => $message, 'version' => $nextVer, 'updatedAt' => date(DATE_ATOM)]);
+        send(200, ['mesaj' => $mesaj, 'referinta' => $referinta, 'version' => $nextVer, 'updatedAt' => date(DATE_ATOM)]);
     } catch (Exception $e) {
         if ($pdo->inTransaction()) $pdo->rollBack();
         send(500, ['error' => 'db_error', 'message' => $e->getMessage()]);

@@ -18,19 +18,30 @@ $context = stream_context_create([
   ]
 ]);
 
-$verseText = $defaultDesc;
+$verseText = "";
+$referenceText = "";
 $data = @file_get_contents($apiUrl, false, $context);
 
 if ($data) {
   $json = json_decode($data, true);
-  if (isset($json['message']) && !empty(trim($json['message']))) {
-    $verseText = trim($json['message']);
+  if (isset($json['mesaj']) && !empty(trim($json['mesaj']))) {
+    $verseText = trim($json['mesaj']);
+    $referenceText = isset($json['referinta']) ? trim($json['referinta']) : "";
   }
 }
 
-// Escapăm textul pentru a fi sigur în meta-tag-uri
-$safeVerse = htmlspecialchars($verseText, ENT_QUOTES, 'UTF-8');
+$displayMessage = $verseText;
+if (!empty($referenceText)) {
+  $displayMessage .= " " . $referenceText;
+}
+
+if (empty($displayMessage)) {
+  $displayMessage = $defaultDesc;
+}
+
+$safeVerse = htmlspecialchars($displayMessage, ENT_QUOTES, 'UTF-8');
 $shortVerse = (mb_strlen($safeVerse) > 150) ? mb_substr($safeVerse, 0, 147) . "..." : $safeVerse;
+$versionStr = isset($json['version']) ? $json['version'] : time();
 ?>
 <!doctype html>
 <html lang="ro">
@@ -40,7 +51,7 @@ $shortVerse = (mb_strlen($safeVerse) > 150) ? mb_substr($safeVerse, 0, 147) . ".
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-5LDRNQXXG7"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+    function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
 
     gtag('config', 'G-5LDRNQXXG7');
@@ -58,7 +69,7 @@ $shortVerse = (mb_strlen($safeVerse) > 150) ? mb_substr($safeVerse, 0, 147) . ".
   <meta property="og:url" content="https://www.azstulcea.ro/timp-tulcea/" />
   <meta property="og:title" content="<?php echo $defaultTitle; ?>" />
   <meta property="og:description" content="&ldquo;<?php echo $shortVerse; ?>&rdquo;" />
-  <meta property="og:image" content="https://www.azstulcea.ro/timp-tulcea/assets/logo-sc_sabat_vibranta.png" />
+  <meta property="og:image" content="https://www.azstulcea.ro/timp-tulcea/api/og-image.php?v=<?php echo urlencode($versionStr); ?>" />
   <meta property="og:image:alt" content="Verset de memorat Scoala de Sabat" />
 
   <!-- Twitter / X (Rich Preview Cards) -->
@@ -66,11 +77,11 @@ $shortVerse = (mb_strlen($safeVerse) > 150) ? mb_substr($safeVerse, 0, 147) . ".
   <meta property="twitter:url" content="https://www.azstulcea.ro/timp-tulcea/" />
   <meta property="twitter:title" content="<?php echo $defaultTitle; ?>" />
   <meta property="twitter:description" content="<?php echo $safeVerse; ?>" />
-  <meta property="twitter:image" content="https://www.azstulcea.ro/timp-tulcea/assets/logo-sc_sabat_vibranta.png" />
+  <meta property="twitter:image" content="https://www.azstulcea.ro/timp-tulcea/api/og-image.php?v=<?php echo urlencode($versionStr); ?>" />
 
   <!-- Performance & External Resources -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.8.0/suncalc.min.js"></script>
-  <script src="main.js"></script>
+  <script src="main.js?v=1.6.0"></script>
   <link rel="stylesheet" href="style.css" />
 </head>
 
@@ -99,6 +110,20 @@ $shortVerse = (mb_strlen($safeVerse) > 150) ? mb_substr($safeVerse, 0, 147) . ".
             <span class="slider round glass-panel"></span>
           </label>
         </div>
+      </div>
+
+      <div class="study-link-wrapper">
+        <a href="https://mybible.eu/sabbath-school/adults" target="_blank" class="study-button glass-panel">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="study-icon">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+          </svg>
+          <span>Vezi studiul complet</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="arrow-icon">
+            <path d="M5 12h14"></path>
+            <path d="m12 5 7 7-7 7"></path>
+          </svg>
+        </a>
       </div>
     </main>
 
@@ -182,8 +207,13 @@ $shortVerse = (mb_strlen($safeVerse) > 150) ? mb_substr($safeVerse, 0, 147) . ".
 
       <div class="modal-body">
         <div class="setting-group">
-          <label for="modal-text-input">Text personalizat sau verset</label>
-          <input type="text" id="modal-text-input" placeholder="Scrie un mesaj aici..." />
+          <label for="modal-text-input">Verset de memorat</label>
+          <textarea id="modal-text-input" placeholder="Scrie versetul aici..." rows="3"></textarea>
+        </div>
+
+        <div class="setting-group">
+          <label for="modal-ref-input">Referința (ex: 1Tesaloniceni 5:18)</label>
+          <input type="text" id="modal-ref-input" placeholder="(Referința)" />
         </div>
 
         <div class="setting-option">
@@ -219,6 +249,9 @@ $shortVerse = (mb_strlen($safeVerse) > 150) ? mb_substr($safeVerse, 0, 147) . ".
       </div>
 
       <div class="modal-footer">
+        <div class="modal-footer-info">
+          <span class="app-version">Versiune: 1.5.1</span>
+        </div>
         <button id="save-button" class="primary-btn">Salvează</button>
       </div>
     </div>

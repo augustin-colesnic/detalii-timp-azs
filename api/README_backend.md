@@ -15,7 +15,7 @@ Deployment steps (shared hosting, Apache):
 4. If you moved `config.php`/DB, update the `db_path` in the copied `config.php` or leave as-is if you placed the DB in the cgi-bin and `config.php` points to it.
 4. Run `api/init_db.php` once (open in browser) to create the SQLite DB. Remove or protect `init_db.php` afterwards.
 5. Test GET: https://your-site/timp-tulcea/api.php?action=get
-6. To update default (admin): POST JSON to https://your-site/timp-tulcea/api/api.php?action=set with header `X-Admin-Token: <your token>` and body `{ "message": "New default" }`.
+6. To update default (admin): POST JSON to https://your-site/timp-tulcea/api/api.php?action=set with header `X-Admin-Token: <your token>` and body `{ "mesaj": "New default", "referinta": "(Ref 1:1)" }`.
 
 Notes & security:
 - Do NOT expose `admin_token` in client-side code. Use server-side admin pages or tooling that keep the token secret.

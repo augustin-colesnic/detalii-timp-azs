@@ -1,6 +1,6 @@
 PHP + SQLite pentru mesajul implicit (soluție pentru shared hosting)
 
-Această mapă conține un backend minim PHP + SQLite care păstrează un "mesaj implicit" setat de administrator. Aplicația client (front-end) va cere acest mesaj la pornire dacă utilizatorul nu are un suprascris local în localStorage.
+Această mapă conține un backend minim PHP + SQLite care păstrează un "mesaj implicit" setat de administrator. Aplicația client (front-end) va cere acest mesaj la pornire dacă utilizatorul nu are un suprascris local în sessionStorage.
 
 Fișiere principale:
 - `config.php` - șablon de configurație (setați `admin_token` și `db_path`). Păstrați acest fișier în siguranță (ideal în `cgi-bin` sau în afara `public_html`).
@@ -81,5 +81,5 @@ header('Access-Control-Allow-Origin: https://www.azstulcea.ro');
 
 ### Exemplu de flux
 - Administratorul editează mesajul folosind curl sau o pagină `admin.php` server-side.
-- Clienții la pornire: front-end (în `main.js`) cere `GET /api/api.php?action=get`. Dacă utilizatorul are `localStorage` cu un text personalizat, front-end îl folosește pe acela; altfel folosește mesajul de la server.
+- Clienții la pornire: front-end (în `main.js`) cere `GET /api/api.php?action=get`. Dacă utilizatorul are `sessionStorage` cu un text personalizat, front-end îl folosește pe acela; altfel folosește mesajul de la server.
 

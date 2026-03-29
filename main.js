@@ -1,4 +1,16 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    /** 
+     * MIGRARE & CLEANUP:
+     * Ștergem vechile chei din localStorage (dacă există) pentru a asigura că aplicația folosește 
+     * doar sessionStorage și preia mereu datele proaspete de pe server la fiecare sesiune nouă.
+     */
+    const keysToCleanup = ['customDesktopText', 'customDesktopRef', 'firstLetterMethodEnabled', 'desktopLayout'];
+    keysToCleanup.forEach(k => {
+        if (localStorage.getItem(k)) {
+            localStorage.removeItem(k);
+        }
+    });
+
     const clockElement = document.getElementById('clock');
     const dayOfWeekElement = document.getElementById('day-of-week');
     const fullDateElement = document.getElementById('full-date');
@@ -10,6 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const editButton = document.getElementById('edit-button-mini');
     const modal = document.getElementById('settings-modal');
     const modalInput = document.getElementById('modal-text-input');
+    const modalRefInput = document.getElementById('modal-ref-input');
     const saveButton = document.getElementById('save-button');
     const fetchServerButton = document.getElementById('fetch-server-button');
 
@@ -85,9 +98,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     function loadCustomText() {
         // Prefer local override; otherwise fetch server default
         return (async () => {
-            const savedText = localStorage.getItem('customDesktopText');
+            const savedText = sessionStorage.getItem('customDesktopText');
+            const savedRef = sessionStorage.getItem('customDesktopRef') || '';
             if (savedText && savedText.trim() !== '') {
                 modalInput.value = savedText;
+                modalRefInput.value = savedRef;
                 customTextWrapper.classList.add('visible');
                 updateCustomTextDisplay(); // Call updateCustomTextDisplay to apply styling
                 startPetalRain();
@@ -97,13 +112,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             // No local override — try loading server default
             try {
                 const server = await fetchServerDefault();
-                if (server && server.message && server.message.trim() !== '') {
-                    modalInput.value = server.message;
-                    customTextDisplay.textContent = server.message;
+                if (server && server.mesaj && server.mesaj.trim() !== '') {
+                    modalInput.value = server.mesaj;
+                    modalRefInput.value = server.referinta || '';
                     customTextWrapper.classList.add('visible');
                     window._serverMessageVersion = server.version || null;
                     updateCustomTextDisplay();
-                    startPetalRain(); // Added here
+                    startPetalRain(); 
                 }
             } catch (e) {
                 // silently ignore — app still works with empty message
@@ -113,7 +128,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function loadLayoutPreference() {
-        const savedLayout = localStorage.getItem('desktopLayout') || 'extended';
+        const savedLayout = sessionStorage.getItem('desktopLayout') || 'extended';
         if (savedLayout === 'compact') {
             document.body.classList.add('compact-view');
             document.getElementById('layout-compact').checked = true;
@@ -135,10 +150,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     saveButton.addEventListener('click', () => {
         const value = modalInput.value;
+        const refValue = modalRefInput.value;
         const toggle = document.getElementById('first-letter-toggle');
         
-        localStorage.setItem('customDesktopText', value);
-        localStorage.setItem('firstLetterMethodEnabled', toggle.checked);
+        sessionStorage.setItem('customDesktopText', value);
+        sessionStorage.setItem('customDesktopRef', refValue);
+        sessionStorage.setItem('firstLetterMethodEnabled', toggle.checked);
 
         if (value.trim() !== '') {
             customTextWrapper.classList.add('visible');
@@ -154,7 +171,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const toggleInput = document.getElementById('first-letter-toggle');
     if (toggleInput) {
         toggleInput.addEventListener('change', () => {
-            localStorage.setItem('firstLetterMethodEnabled', toggleInput.checked);
+            sessionStorage.setItem('firstLetterMethodEnabled', toggleInput.checked);
             updateCustomTextDisplay();
         });
     }
@@ -162,6 +179,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Modal input: auto-update preview
     if (modalInput) {
         modalInput.addEventListener('input', updateCustomTextDisplay);
+    }
+    if (modalRefInput) {
+        modalRefInput.addEventListener('input', updateCustomTextDisplay);
     }
 
     // Fetch latest server default on demand
@@ -181,8 +201,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             const start = performance.now();
             const server = await fetchServerDefault();
             const durationMs = Math.round(performance.now() - start);
-            if (server && server.message) {
-                modalInput.value = server.message;
+            if (server && server.mesaj) {
+                modalInput.value = server.mesaj;
+                modalRefInput.value = server.referinta || '';
                 window._serverMessageVersion = server.version || null;
                 updateCustomTextDisplay();
                 fetchServerButton.textContent = `Preluat ✔ (${durationMs}ms)`;
@@ -199,7 +220,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.querySelectorAll('input[name="layout"]').forEach(radio => {
         radio.addEventListener('change', (e) => {
             const newLayout = e.target.value;
-            localStorage.setItem('desktopLayout', newLayout);
+            sessionStorage.setItem('desktopLayout', newLayout);
             if (newLayout === 'compact') {
                 document.body.classList.add('compact-view');
             } else {
@@ -211,6 +232,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
     modalInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') saveButton.click(); });
+    modalRefInput.addEventListener('keyup', (e) => { if (e.key === 'Enter') saveButton.click(); });
 
     // First Letter Method: convert text to initials
     function firstLetterMethod(text) {
@@ -230,20 +252,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Update custom text display based on modal input and toggle
     function updateCustomTextDisplay() {
-        const input = document.getElementById('modal-text-input').value;
+        const versePart = document.getElementById('modal-text-input').value;
+        const referencePart = document.getElementById('modal-ref-input').value;
         const useFirstLetter = document.getElementById('first-letter-toggle').checked;
         const display = document.getElementsByClassName('custom-text-display').item(0);
         
-        // Regex to separate text from reference (e.g. "(1Tesaloniceni 5:18)")
-        const match = input.match(/^(.*?)\s*(\([^)]+\))\s*$/s);
-        let versePart = input;
-        let referencePart = '';
-        
-        if (match) {
-            versePart = match[1];
-            referencePart = match[2];
-        }
-
         let processedVerse = useFirstLetter ? firstLetterMethod(versePart) : boldFirstLetterOfEachWord(versePart);
         
         display.innerHTML = `
@@ -264,7 +277,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function loadFirstLetterTogglePreference() {
         const firstLetterToggle = document.getElementById('first-letter-toggle');
-        const savedToggleState = localStorage.getItem('firstLetterMethodEnabled');
+        const savedToggleState = sessionStorage.getItem('firstLetterMethodEnabled');
         if (savedToggleState !== null) {
             firstLetterToggle.checked = JSON.parse(savedToggleState);
         }
@@ -319,7 +332,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const firstLetterToggle = document.getElementById('first-letter-toggle');
     if (firstLetterToggle) {
         firstLetterToggle.addEventListener('change', (e) => {
-            localStorage.setItem('firstLetterMethodEnabled', JSON.stringify(e.target.checked));
+            sessionStorage.setItem('firstLetterMethodEnabled', JSON.stringify(e.target.checked));
             updateCustomTextDisplay(); // Update display immediately on toggle change
         });
     }
